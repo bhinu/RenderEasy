@@ -1,0 +1,163 @@
+RenderEase - Complete Project Structure
+========================================
+
+566 Final Project/
+│
+├── Backend (Python/Flask)
+│   ├── backend/
+│   │   ├── cv_algorithms/          # Computer Vision Modules
+│   │   │   ├── __init__.py
+│   │   │   ├── edge_detector.py    # Canny, Sobel, Laplacian edge detection
+│   │   │   ├── hough_transform.py  # Hough line and circle detection
+│   │   │   ├── segmentation.py     # Color, GrabCut, Watershed, K-means
+│   │   │   ├── homography.py       # Perspective transformations
+│   │   │   └── texture_generator.py# Procedural texture generation
+│   │   │
+│   │   ├── app.py                  # Flask API server with endpoints
+│   │   ├── requirements.txt        # Python dependencies
+│   │   └── .env                    # Environment configuration
+│   │
+│   └── venv/                       # Python virtual environment (created by setup)
+│
+├── Frontend (React)
+│   └── frontend/
+│       ├── public/
+│       │   └── index.html          # HTML template
+│       │
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── ImageUploader.js    # Image upload component
+│       │   │   ├── ImageUploader.css
+│       │   │   ├── Canvas.js           # Canvas for image display & selection
+│       │   │   ├── Canvas.css
+│       │   │   ├── TextureLibrary.js   # Texture selection grid
+│       │   │   ├── TextureLibrary.css
+│       │   │   ├── Controls.js         # Settings controls
+│       │   │   └── Controls.css
+│       │   │
+│       │   ├── services/
+│       │   │   └── api.js              # API service layer
+│       │   │
+│       │   ├── App.js                  # Main application component
+│       │   ├── App.css                 # Main app styles
+│       │   ├── index.js                # React entry point
+│       │   └── index.css               # Global styles
+│       │
+│       ├── package.json            # Node.js dependencies
+│       ├── .env                    # Frontend configuration
+│       └── node_modules/           # Node packages (created by setup)
+│
+├── Scripts
+│   ├── setup.sh                    # One-time setup script
+│   ├── run-backend.sh              # Start Flask server
+│   ├── run-frontend.sh             # Start React dev server
+│   └── run-all.sh                  # Start both servers
+│
+├── Documentation
+│   ├── NEW_README.md               # Complete documentation
+│   ├── SETUP_GUIDE.md              # Detailed setup instructions
+│   ├── PROJECT_STRUCTURE.txt       # This file
+│   ├── README.md                   # Original vanilla JS version docs
+│   ├── QUICKSTART.md               # Quick start guide
+│   └── PROJECT_SUMMARY.md          # Project overview
+│
+├── Legacy Files (Vanilla JS Version)
+│   ├── index.html                  # Original HTML version
+│   ├── app.js                      # Original vanilla JS
+│   ├── styles.css                  # Original styles
+│   ├── start.sh                    # Original startup script
+│   └── ARCHITECTURE.md             # Original architecture docs
+│
+└── Uploads
+    └── uploads/                    # Storage for uploaded images
+
+
+Key Technologies
+================
+
+Backend:
+- Flask 3.0 - Web framework
+- OpenCV 4.8 - Computer vision
+- NumPy 1.24 - Numerical computing
+- Pillow 10.1 - Image processing
+- Flask-CORS 4.0 - CORS support
+
+Frontend:
+- React 18.2 - UI framework
+- Axios 1.6 - HTTP client
+- React Scripts 5.0 - Build tools
+
+Computer Vision Algorithms:
+- Canny Edge Detection
+- Sobel Edge Detection
+- Laplacian Edge Detection
+- Hough Line Transform (Standard & Probabilistic)
+- Hough Circle Transform
+- Color-based Segmentation (HSV/LAB)
+- GrabCut Segmentation
+- Watershed Segmentation
+- K-means Clustering
+- Mean Shift Segmentation
+- Homography Transformation
+- Perspective Warping
+
+
+API Endpoints
+=============
+
+GET  /api/health              - Health check
+POST /api/edge-detection      - Detect edges (Canny, Sobel, Laplacian)
+POST /api/detect-lines        - Hough line detection
+POST /api/segment             - Image segmentation
+POST /api/generate-texture    - Generate procedural texture
+POST /api/apply-texture       - Apply texture with perspective
+POST /api/detect-surfaces     - Auto-detect surfaces
+POST /api/process-complete    - Complete processing pipeline
+
+
+Quick Start
+===========
+
+1. Setup (one-time):
+   ./setup.sh
+
+2. Run application:
+   ./run-all.sh
+
+3. Access:
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:5000
+
+
+File Sizes
+==========
+
+Backend:
+- app.py: ~10 KB
+- edge_detector.py: ~5 KB
+- hough_transform.py: ~8 KB
+- segmentation.py: ~10 KB
+- homography.py: ~7 KB
+- texture_generator.py: ~9 KB
+
+Frontend:
+- App.js: ~8 KB
+- Canvas.js: ~3 KB
+- ImageUploader.js: ~1 KB
+- TextureLibrary.js: ~2 KB
+- Controls.js: ~2 KB
+- api.js: ~3 KB
+
+Total Project: ~100 KB (excluding dependencies)
+
+
+Team
+====
+
+Bhinu Puvva - puvvala@wisc.edu
+Bala Shukla - shukla35@wisc.edu
+Rain Jiayu Sun - jsun424@wisc.edu
+
+COMP SCI 566 - Intro to Computer Vision
+University of Wisconsin-Madison
+
