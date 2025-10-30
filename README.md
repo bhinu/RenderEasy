@@ -1,6 +1,11 @@
 # This is Evaluation and Benchmark
 
-## ⚙️ Environment Setup
+## Comparative Analysis: Traditional vs Deep Learning Segmentation
+
+This branch focuses on **evaluating and comparing** traditional computer vision and deep learning segmentation methods for indoor scenes.  
+The goal is to **measure segmentation accuracy, texture replacement quality, and computational efficiency**, enabling precise overlays (like Photoshop’s select-and-replace feature) while minimizing CPU/GPU usage.
+
+## Environment Setup
 
 ```bash
 # Create Python environment 
@@ -17,12 +22,6 @@ source /venv/bin/activate # for bash
 # Install dependencies
 pip install torch torchvision opencv-python scikit-image segmentation-models-pytorch matplotlib pandas
 ```
-
-### Comparative Analysis: Traditional vs Deep Learning Segmentation
-
-This branch focuses on **evaluating and comparing** traditional computer vision and deep learning segmentation methods for indoor scenes.  
-The goal is to **measure segmentation accuracy, texture replacement quality, and computational efficiency**, enabling precise overlays (like Photoshop’s select-and-replace feature) while minimizing CPU/GPU usage.
-
 
 ## Evaluation Objectives
 
@@ -43,6 +42,18 @@ We focus on indoor datasets with **ground truth annotations** for semantic and p
 
 
 ## Evaluation Metrics
+
+| Category | Metric | Description |
+| :--- | :--- | :--- |
+| **Segmentation Accuracy** | IoU (Intersection over Union) | Overlap with ground truth masks |
+| **Segmentation Accuracy** | Mean IoU (mIoU) | Average IoU across all target classes (walls, floors, ceilings) |
+| **Segmentation Accuracy** | Pixel Accuracy | Fraction of correctly classified pixels |
+| **Segmentation Accuracy** | Boundary Precision / Recall (BPR) | Accuracy of object/surface boundaries |
+| **Visual Quality** | SSIM (Structural Similarity) | Structural similarity after texture replacement |
+| **Visual Quality** | PSNR (Peak Signal-to-Noise Ratio) | Quantifies texture fidelity vs reference |
+| **Visual Quality** | LPIPS (optional) | Perceptual similarity metric for realism |
+| **Efficiency** | Inference Time | Average runtime per image (CPU/GPU) |
+| **Efficiency** | Memory Usage | Peak RAM or GPU memory during inference |
 
 ## Stage 1 - Segmentation Accuracy Comparision (we are currently on)
 
