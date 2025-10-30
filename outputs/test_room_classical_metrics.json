@@ -1,0 +1,27 @@
+{
+  "method": "classical",
+  "image": "test_room.JPG",
+  "surface_type": "wall",
+  "segmentation_time": 0.06842708587646484,
+  "mask_area_ratio": 0.3542769779593936,
+  "corners": [
+    [
+      241,
+      1658
+    ],
+    [
+      3879,
+      690
+    ],
+    [
+      3742,
+      1857
+    ],
+    [
+      379,
+      2956
+    ]
+  ],
+  "output_path": "outputs/test_room_classical_result.png",
+  "timestamp": "2025-10-30T12:24:18.158883",
+  "num_edges": 

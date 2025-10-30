@@ -1,0 +1,333 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\title{RenderEase: Comparative Analysis of Surface Segmentation Methods for Interior Texture Transfer\\
+\large COMP SCI 566 - Midterm Report}
+\author{Bhinu Puvva, Bala Shukla, Rain Jiayu Sun}
+\date{October 30, 2025}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\subsection{Problem Statement}
+Interior texture visualization requires accurate detection and segmentation of planar surfaces (walls, floors, ceilings) in photographs, followed by perspective-correct texture mapping. This presents several computer vision challenges:
+
+\begin{itemize}
+    \item \textbf{Surface Segmentation}: Separating distinct planar regions in complex indoor scenes with varying lighting, occlusions, and clutter
+    \item \textbf{Perspective Estimation}: Computing accurate homographies for texture warping despite camera distortion and non-ideal viewing angles
+    \item \textbf{Photometric Consistency}: Maintaining realistic appearance through proper lighting and shadow integration
+\end{itemize}
+
+\subsection{Research Questions}
+\begin{enumerate}
+    \item How do classical computer vision methods (edge detection + Hough transform) compare to deep learning approaches (DeepLab, SAM) for planar surface segmentation in indoor scenes?
+    \item What are the failure modes of each approach, and under what conditions does each method excel?
+    \item Can we achieve real-time or near-real-time performance while maintaining acceptable segmentation accuracy?
+\end{enumerate}
+
+\subsection{Motivation}
+While commercial tools exist for interior design visualization, they are often expensive and proprietary. Understanding the trade-offs between classical and modern CV approaches provides insights into:
+\begin{itemize}
+    \item Computational efficiency vs. accuracy
+    \item Generalization across different room types and lighting conditions
+    \item Requirements for training data and domain adaptation
+\end{itemize}
+
+\section{Related Work}
+
+\subsection{Planar Surface Detection}
+Classical methods for plane detection include RANSAC-based approaches and Hough transform variants. Liu et al. (2018) introduced PlaneRCNN for instance segmentation of planes using Mask R-CNN architecture. PlaneNet (Liu et al., 2019) uses single-view images to predict plane parameters and pixel-wise segmentation.
+
+\subsection{Semantic Segmentation}
+DeepLabv3+ (Chen et al., 2018) employs atrous convolution and encoder-decoder structure for dense prediction. Segment Anything Model (SAM) (Kirillov et al., 2023) provides promptable segmentation with strong zero-shot generalization capabilities.
+
+\subsection{Homography and Texture Transfer}
+Homography estimation for planar surfaces is well-established through direct linear transformation (DLT) or feature-based methods (Hartley \& Zisserman, 2004). Recent work on neural texture synthesis has explored learning-based approaches for photorealistic rendering.
+
+\subsection{Image-Based Rendering}
+Debevec et al.'s work on image-based modeling and rendering established foundational techniques for realistic scene reconstruction. More recent work explores neural rendering and light field synthesis.
+
+\section{Methodology}
+
+\subsection{Pipeline Overview}
+Our system consists of four main stages:
+
+\begin{enumerate}
+    \item \textbf{Input Processing}: Load room image and target texture
+    \item \textbf{Surface Segmentation}: Identify planar regions using multiple methods
+    \item \textbf{Homography Estimation}: Compute perspective transformation
+    \item \textbf{Texture Blending}: Apply texture with lighting/shadow preservation
+\end{enumerate}
+
+% Add a figure here if you have a pipeline diagram
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=\textwidth]{pipeline.png}
+% \caption{System pipeline overview}
+% \end{figure}
+
+\subsection{Classical Approach}
+
+\subsubsection{Edge Detection and Line Extraction}
+\begin{enumerate}
+    \item Apply Canny edge detection with adaptive thresholding
+    \item Use Probabilistic Hough Transform to detect line segments
+    \item Cluster lines by orientation to identify dominant directions (typically horizontal/vertical for walls)
+    \item Compute line intersections to find corner points
+\end{enumerate}
+
+\subsubsection{Surface Mask Creation}
+\begin{enumerate}
+    \item Create convex hull or polygon from detected corners
+    \item Generate binary mask for target surface
+    \item Apply morphological operations for refinement
+\end{enumerate}
+
+\subsection{Deep Learning Approaches}
+
+\subsubsection{DeepLabv3+ Segmentation}
+\begin{itemize}
+    \item Use pretrained ResNet-101 backbone on ADE20K dataset
+    \item Fine-tune on indoor scene images (if time permits)
+    \item Extract wall/floor/ceiling classes from output
+\end{itemize}
+
+\subsubsection{Segment Anything Model (SAM)}
+\begin{itemize}
+    \item Use ViT-H checkpoint for highest accuracy
+    \item Generate automatic mask proposals
+    \item Post-process to select largest planar surfaces
+    \item Alternative: Interactive mode with point/box prompts
+\end{itemize}
+
+\subsection{Homography and Texture Warping}
+
+Given 4 corner points of target surface $\{p_i\}$ and corresponding texture corners $\{p'_i\}$:
+
+\begin{equation}
+    H = \begin{bmatrix} h_{11} & h_{12} & h_{13} \\ h_{21} & h_{22} & h_{23} \\ h_{31} & h_{32} & 1 \end{bmatrix}
+\end{equation}
+
+Solve using Direct Linear Transformation (DLT) or RANSAC for robustness.
+
+Apply warped texture using:
+\begin{equation}
+    I_{result} = M \odot I_{warped} + (1-M) \odot I_{original}
+\end{equation}
+where $M$ is the surface mask and $\odot$ denotes element-wise multiplication.
+
+\subsection{Evaluation Metrics}
+
+\subsubsection{Segmentation Quality}
+\begin{itemize}
+    \item \textbf{Intersection over Union (IoU)}: $IoU = \frac{|A \cap B|}{|A \cup B|}$
+    \item \textbf{Pixel Accuracy}: Percentage of correctly classified pixels
+    \item \textbf{Boundary F-score}: Precision/recall on boundary pixels
+\end{itemize}
+
+\subsubsection{Geometric Accuracy}
+\begin{itemize}
+    \item \textbf{Corner Point Error}: Average distance between detected and ground truth corners
+    \item \textbf{Line Orientation Error}: Angular difference from expected perpendicular lines
+\end{itemize}
+
+\subsubsection{Performance}
+\begin{itemize}
+    \item \textbf{Runtime}: Time per image on standard hardware
+    \item \textbf{Memory Usage}: Peak GPU/CPU memory consumption
+\end{itemize}
+
+\section{Progress and Preliminary Results}
+
+\subsection{Implementation Status}
+
+\textbf{Completed:}
+\begin{itemize}
+    \item Environment setup and dependencies (OpenCV, PyTorch)
+    \item Data collection: 20-30 indoor room images
+    \item Classical pipeline: Edge detection + Hough transform
+    \item Basic homography estimation and texture warping
+    \item Initial GUI prototype for image upload and surface selection
+\end{itemize}
+
+\textbf{In Progress:}
+\begin{itemize}
+    \item DeepLabv3+ integration and testing
+    \item SAM model integration
+    \item Quantitative evaluation framework
+    \item Lighting/shadow preservation in blending
+\end{itemize}
+
+\textbf{Not Started:}
+\begin{itemize}
+    \item Comprehensive benchmarking on standard datasets
+    \item Fine-tuning deep models (if needed)
+    \item User study for visual quality assessment
+\end{itemize}
+
+\subsection{Preliminary Qualitative Results}
+
+% Add figures showing your current results
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.8\textwidth]{results_comparison.png}
+% \caption{Comparison of segmentation methods on sample images}
+% \end{figure}
+
+\textbf{Classical Method Observations:}
+\begin{itemize}
+    \item Works well on clean, well-lit rooms with clear edges
+    \item Struggles with cluttered scenes and complex furniture occlusions
+    \item Fast processing ($<$ 100ms per image)
+    \item Sensitive to lighting variations and shadows
+\end{itemize}
+
+\textbf{Deep Learning (Preliminary):}
+\begin{itemize}
+    \item DeepLab shows robust performance on varied lighting
+    \item Better handling of partial occlusions
+    \item Slower processing (~500-1000ms depending on resolution)
+    \item Some over-segmentation issues in textured areas
+\end{itemize}
+
+\subsection{Quantitative Results (Preliminary)}
+
+% Replace with your actual numbers
+\begin{table}[h]
+\centering
+\caption{Preliminary performance comparison on test set (N=10 images)}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method & Avg IoU & Runtime (ms) & Success Rate \\
+\midrule
+Hough + Edges & 0.XX & XX & X/10 \\
+DeepLabv3+ & 0.XX & XX & X/10 \\
+SAM (auto) & 0.XX & XX & X/10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textit{Note: IoU computed against manually annotated surface masks. Success defined as IoU $>$ 0.7.}
+
+\subsection{Failure Case Analysis}
+
+\textbf{Common Failure Modes:}
+\begin{enumerate}
+    \item \textbf{Non-planar surfaces}: Curved walls or irregular floor plans
+    \item \textbf{Extreme perspectives}: Wide-angle lenses causing distortion
+    \item \textbf{Poor lighting}: Shadows creating false edges
+    \item \textbf{Heavy occlusion}: Furniture blocking most of wall/floor
+    \item \textbf{Texture confusion}: Patterned wallpaper interfering with segmentation
+\end{enumerate}
+
+\section{Challenges Encountered}
+
+\subsection{Technical Challenges}
+\begin{itemize}
+    \item \textbf{Ground Truth Creation}: Manually annotating surfaces is time-consuming; considering using synthetic data (Structured3D)
+    \item \textbf{Model Selection}: SAM has many prompt strategies; determining optimal approach for our use case
+    \item \textbf{Lighting Preservation}: Simple alpha blending looks unrealistic; need better shadow/lighting transfer
+\end{itemize}
+
+\subsection{Dataset Challenges}
+\begin{itemize}
+    \item Limited availability of indoor images with ground truth plane annotations
+    \item Diverse room types and styles make evaluation challenging
+    \item Copyright issues with high-quality interior design photos
+\end{itemize}
+
+\section{Updated Timeline and Remaining Work}
+
+\subsection{Week 7-8 (Current - Early November)}
+\begin{itemize}
+    \item Complete SAM integration and testing
+    \item Implement all evaluation metrics
+    \item Run comprehensive experiments on 50+ images
+    \item Create ground truth annotations for test set
+\end{itemize}
+
+\subsection{Week 9-10 (Mid November)}
+\begin{itemize}
+    \item Improve texture blending with lighting adjustment
+    \item Implement shadow detection and preservation
+    \item Compare with baseline from research literature
+    \item Ablation studies on key components
+\end{itemize}
+
+\subsection{Week 11-12 (Late November)}
+\begin{itemize}
+    \item Finalize GUI for demonstration
+    \item Create video demonstration
+    \item Write final report
+    \item Prepare presentation slides
+\end{itemize}
+
+\subsection{Week 13-14 (Early December)}
+\begin{itemize}
+    \item Final testing and bug fixes
+    \item User study (optional, if time permits)
+    \item Documentation and code cleanup
+    \item Presentation preparation
+\end{itemize}
+
+\section{Expected Contributions}
+
+By the end of this project, we expect to deliver:
+
+\begin{enumerate}
+    \item \textbf{Comparative Analysis}: Quantitative comparison of classical vs. deep learning approaches for indoor surface segmentation
+    \item \textbf{Failure Mode Documentation}: Detailed analysis of when each method fails and why
+    \item \textbf{Working Prototype}: End-to-end system demonstrating texture transfer pipeline
+    \item \textbf{Performance Benchmarks}: Runtime and accuracy metrics on standard test cases
+    \item \textbf{Open-Source Implementation}: Clean, documented codebase for future research
+\end{enumerate}
+
+\section{Conclusion}
+
+We have made solid progress on implementing the classical computer vision pipeline and are in the process of integrating deep learning methods. Early results suggest that each approach has distinct advantages: classical methods offer speed and interpretability, while deep learning provides robustness to challenging conditions. The remaining work focuses on comprehensive evaluation, refinement of the blending stage, and thorough documentation of our findings.
+
+The main adjustment from our original proposal is a stronger emphasis on scientific evaluation and comparison rather than building a polished end-user tool. This aligns better with the research objectives of the course and will provide more valuable insights into the trade-offs between different CV approaches for this problem domain.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+
+\bibitem{planeRCNN}
+Liu, C., Kim, K., Gu, J., Furukawa, Y., \& Kautz, J. (2018).
+PlaneRCNN: 3D plane detection and reconstruction from a single image.
+\textit{CVPR 2019}.
+
+\bibitem{deeplab}
+Chen, L. C., Zhu, Y., Papandreou, G., Schroff, F., \& Adam, H. (2018).
+Encoder-decoder with atrous separable convolution for semantic image segmentation.
+\textit{ECCV 2018}.
+
+\bibitem{sam}
+Kirillov, A., et al. (2023).
+Segment anything.
+\textit{ICCV 2023}.
+
+\bibitem{hartley}
+Hartley, R., \& Zisserman, A. (2004).
+Multiple view geometry in computer vision.
+\textit{Cambridge University Press}.
+
+\bibitem{planenet}
+Liu, C., Yang, J., Ceylan, D., Yumer, E., \& Furukawa, Y. (2018).
+PlaneNet: Piece-wise planar reconstruction from a single RGB image.
+\textit{CVPR 2018}.
+
+\bibitem{debevec}
+Debevec, P. E., Taylor, C. J., \& Malik, J. (1996).
+Modeling and rendering architecture from photographs: A hybrid geometry-and image-based approach.
+\textit{SIGGRAPH 1996}.
+
+\end{thebibliography}
+
+\end{document}
