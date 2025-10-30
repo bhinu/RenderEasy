@@ -515,21 +515,3 @@ This is a class project. Feel free to:
 ## 📄 License
 
 MIT License - Academic use for COMP SCI 566
-
----
-
-## 🆘 Need Help?
-
-1. Run `python test_suite.py --all` to see if everything works
-2. Check the `outputs/` directory for results
-3. Read error messages carefully
-4. Check troubleshooting section above
-
-**For your midterm report**, you mainly need:
-
-1. Run test suite: `python test_suite.py --all`
-2. Get comparison: Use evaluation.py functions
-3. Copy numbers to your report
-4. Include generated plots
-
-Good luck! 🚀
